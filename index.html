@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPedia - Premium Dashboard</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #161616;
+            --accent: #d4af37; 
+            --text: #e0e0e0;
+            --success: #28a745;
+            --fail: #dc3545;
+            --bonus: #007bff;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; }
+
+        .container { 
+            max-width: 500px; margin: auto; background: var(--card); padding: 20px; 
+            border-radius: 20px; border: 1px solid #222; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+        }
+
+        h2 { text-align: center; color: var(--accent); letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; font-size: 1.5em; }
+        p.sub { text-align: center; color: #555; font-size: 0.75em; margin-bottom: 25px; text-transform: uppercase; }
+        
+        .header-row { display: grid; grid-template-columns: 1fr 60px 60px 80px; gap: 10px; padding: 0 10px 10px; font-size: 0.65em; color: #666; font-weight: bold; text-align: center; }
+        
+        .row { 
+            display: grid; grid-template-columns: 1fr 60px 60px 80px; gap: 10px; align-items: center; 
+            margin-bottom: 10px; background: #1f1f1f; padding: 10px; border-radius: 12px; border-left: 3px solid var(--accent);
+        }
+
+        .day-label { font-weight: 600; font-size: 0.85em; color: #bbb; }
+        
+        input { 
+            width: 100%; background: #000; border: 1px solid #333; color: white; 
+            padding: 8px 2px; border-radius: 6px; text-align: center; font-size: 0.9em; outline: none;
+        }
+        
+        input:focus { border-color: var(--accent); }
+        .in-berhasil { color: var(--success); }
+        .in-gagal { color: var(--fail); }
+        .in-bonus { color: var(--bonus); }
+
+        .rekap-box { 
+            background: linear-gradient(135deg, #111, #1a1a1a); padding: 20px; 
+            border-radius: 15px; margin-top: 20px; border: 1px solid var(--accent);
+        }
+        
+        .rekap-line { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85em; color: #aaa; }
+        .total-gaji { 
+            margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; 
+            color: var(--accent); font-size: 1.4em; font-weight: bold; display: flex; justify-content: space-between;
+        }
+        
+        .btn-group { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { 
+            padding: 15px; border: none; border-radius: 12px; font-weight: bold; 
+            cursor: pointer; font-size: 0.8em; text-transform: uppercase; transition: 0.2s;
+        }
+        
+        .btn-save { background: var(--accent); color: #000; }
+        .btn-copy { background: #222; color: white; border: 1px solid #333; }
+        .btn-excel { background: #ffffff; color: #000; grid-column: span 2; }
+        button:active { transform: scale(0.97); }
+
+        #lastWeekData { margin-top: 25px; font-size: 0.7em; color: #444; border-top: 1px solid #222; padding-top: 15px; white-space: pre-line; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>HPedia</h2>
+    <p class="sub">Logistics & Commission System</p>
+
+    <div class="header-row">
+        <span style="text-align: left;">HARI</span>
+        <span>BERHASIL</span>
+        <span>GAGAL</span>
+        <span>BONUS (Rp)</span>
+    </div>
+
+    <div id="inputList">
+        <!-- Input Days -->
+        <div class="row"><span class="day-label">Senin</span><input type="number" class="in-berhasil" data-day="Senin"><input type="number" class="in-gagal" data-day="Senin"><input type="number" class="in-bonus" data-day="Senin"></div>
+        <div class="row"><span class="day-label">Selasa</span><input type="number" class="in-berhasil" data-day="Selasa"><input type="number" class="in-gagal" data-day="Selasa"><input type="number" class="in-bonus" data-day="Selasa"></div>
+        <div class="row"><span class="day-label">Rabu</span><input type="number" class="in-berhasil" data-day="Rabu"><input type="number" class="in-gagal" data-day="Rabu"><input type="number" class="in-bonus" data-day="Rabu"></div>
+        <div class="row"><span class="day-label">Kamis</span><input type="number" class="in-berhasil" data-day="Kamis"><input type="number" class="in-gagal" data-day="Kamis"><input type="number" class="in-bonus" data-day="Kamis"></div>
+        <div class="row"><span class="day-label">Jumat</span><input type="number" class="in-berhasil" data-day="Jumat"><input type="number" class="in-gagal" data-day="Jumat"><input type="number" class="in-bonus" data-day="Jumat"></div>
+        <div class="row"><span class="day-label">Sabtu</span><input type="number" class="in-berhasil" data-day="Sabtu"><input type="number" class="in-gagal" data-day="Sabtu"><input type="number" class="in-bonus" data-day="Sabtu"></div>
+    </div>
+
+    <div class="rekap-box">
+        <div class="rekap-line"><span>Total Berhasil (50k):</span> <span id="resB">0 Unit</span></div>
+        <div class="rekap-line"><span>Total Gagal (25k):</span> <span id="resG">0 Unit</span></div>
+        <div class="rekap-line"><span>Total Bonus Tambahan:</span> <span id="resBonus">Rp 0</span></div>
+        <div class="total-gaji">
+            <span>TOTAL GAJI</span>
+            <span id="totalGaji">Rp 0</span>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-save" onclick="saveData()">Simpan Data</button>
+        <button class="btn-copy" onclick="copyToNote()">Salin Rekap</button>
+        <button class="btn-excel" onclick="downloadExcel()">Download File Excel (.csv)</button>
+    </div>
+
+    <div id="lastWeekData">Arsip otomatis akan muncul di sini setiap ganti minggu.</div>
+</div>
+
+<script>
+    const TARIF_B = 50000;
+    const TARIF_G = 25000;
+    const inputsB = document.querySelectorAll('.in-berhasil');
+    const inputsG = document.querySelectorAll('.in-gagal');
+    const inputsBonus = document.querySelectorAll('.in-bonus');
+
+    [...inputsB, ...inputsG, ...inputsBonus].forEach(i => i.addEventListener('input', calculate));
+
+    function calculate() {
+        let bTotal = 0, gTotal = 0, bonusTotal = 0;
+        
+        inputsB.forEach(i => bTotal += parseInt(i.value) || 0);
+        inputsG.forEach(i => gTotal += parseInt(i.value) || 0);
+        inputsBonus.forEach(i => bonusTotal += parseInt(i.value) || 0);
+        
+        const totalUang = (bTotal * TARIF_B) + (gTotal * TARIF_G) + bonusTotal;
+        
+        document.getElementById('resB').innerText = bTotal + " Unit";
+        document.getElementById('resG').innerText = gTotal + " Unit";
+        document.getElementById('resBonus').innerText = "Rp " + bonusTotal.toLocaleString('id-ID');
+        document.getElementById('totalGaji').innerText = "Rp " + totalUang.toLocaleString('id-ID');
+        
+        return { bTotal, gTotal, bonusTotal, totalUang };
+    }
+
+    function saveData() {
+        const data = { b: [], g: [], bonus: [] };
+        inputsB.forEach(i => data.b.push(i.value || 0));
+        inputsG.forEach(i => data.g.push(i.value || 0));
+        inputsBonus.forEach(i => data.bonus.push(i.value || 0));
+        
+        localStorage.setItem('hpedia_data', JSON.stringify(data));
+        localStorage.setItem('hpedia_week', getWeekNumber(new Date()));
+        alert("Data Tersimpan! (Aman selama riwayat Chrome tidak dihapus)");
+    }
+
+    function copyToNote() {
+        const res = calculate();
+        let txt = "*REKAP COD HPEDIA*\n\n";
+        const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        days.forEach((day, idx) => {
+            txt += `${day}: B(${inputsB[idx].value || 0}) G(${inputsG[idx].value || 0}) Bonus(${inputsBonus[idx].value || 0})\n`;
+        });
+        txt += `\nTotal Berhasil: ${res.bTotal}\nTotal Gagal: ${res.gTotal}\nBonus: Rp ${res.bonusTotal.toLocaleString('id-ID')}\n*TOTAL GAJI: Rp ${res.totalUang.toLocaleString('id-ID')}*`;
+        navigator.clipboard.writeText(txt).then(() => alert("Rekap disalin ke clipboard!"));
+    }
+
+    function downloadExcel() {
+        const res = calculate();
+        const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        let csvContent = "Hari,Berhasil (50k),Gagal (25k),Bonus (Rp)\n";
+        days.forEach((day, idx) => {
+            csvContent += `${day},${inputsB[idx].value || 0},${inputsG[idx].value || 0},${inputsBonus[idx].value || 0}\n`;
+        });
+        csvContent += `\nTOTAL BERHASIL,${res.bTotal}\nTOTAL GAGAL,${res.gTotal}\nTOTAL BONUS,${res.bonusTotal}\nTOTAL GAJI AKHIR,${res.totalUang}\n`;
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Rekap_HPedia_Minggu_${getWeekNumber(new Date())}.csv`);
+        link.click();
+    }
+
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+        return Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
+    }
+
+    window.onload = function() {
+        const currentW = getWeekNumber(new Date());
+        const savedW = localStorage.getItem('hpedia_week');
+        const savedData = localStorage.getItem('hpedia_data');
+
+        if (savedW && currentW != savedW) {
+            localStorage.setItem('hpedia_old', savedData);
+            localStorage.setItem('hpedia_old_week', savedW);
+            // Reset fields
+            inputsB.forEach(i => i.value = 0);
+            inputsG.forEach(i => i.value = 0);
+            inputsBonus.forEach(i => i.value = 0);
+        } else if (savedData) {
+            const p = JSON.parse(savedData);
+            inputsB.forEach((i, idx) => i.value = p.b[idx] || 0);
+            inputsG.forEach((i, idx) => i.value = p.g[idx] || 0);
+            inputsBonus.forEach((i, idx) => i.value = p.bonus[idx] || 0);
+            calculate();
+        }
+
+        const old = localStorage.getItem('hpedia_old');
+        if (old) {
+            const oldWeek = localStorage.getItem('hpedia_old_week');
+            document.getElementById('lastWeekData').innerText = `ARSIP MINGGU ${oldWeek}:\nData minggu lalu sudah tersimpan. Silahkan download sebagai Excel jika ingin mengamankan secara permanen.`;
+        }
+    };
+</script>
+</body>
+</html>
